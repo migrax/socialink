@@ -50,7 +50,7 @@
 				$state = generate_action_token(time());
 				$app_id = $api->getAppId();
 				$callback = urlencode($callback);
-				$scope = "offline_access,publish_stream,user_about_me,user_location,email";
+				$scope = "user_about_me,user_location,email";
 				
 				$SESSION["socialink_facebook"] = array(
 					"state" => $state,
