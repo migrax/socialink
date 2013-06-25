@@ -121,6 +121,20 @@
 		return $result;
 	}
 
+        function socialink_facebook_get_fbuid($token) {                            
+                $result = null;
+            
+		if(!empty($token) && ($keys = socialink_facebook_available())){
+			if($api = socialink_facebook_get_api_object($keys)) {								
+                                $api->setAccessToken($token);
+                                
+                                $result = $api->getUser();
+                        }
+                }
+                
+                return $result;
+        }
+        
 	function socialink_facebook_authorize($user_guid = 0) {
 		$result = false;
 		
@@ -131,33 +145,20 @@
 		$state = get_input('state', NULL);
 		
 		if(!empty($user_guid) && ($token = socialink_facebook_get_access_token($state))){
-			// only one user per tokens
+                        $fbuid = socialink_facebook_get_fbuid($token);
+			// only one user per fbuid
 			$params = array(
 				"type" => "user",
 				"limit" => false,
 				"site_guids" => false,
 				"plugin_id" => "socialink",
 				"plugin_user_setting_name_value_pairs" => array(
-					"facebook_access_token" => $token
+					"facebook_fbuid" => $fbuid,
 				)
-			);
-			
-			// find hidden users (just created)
-			$access_status = access_get_show_hidden_status();
-			access_show_hidden_entities(true);
-			
-			if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
-				foreach ($users as $user) {
-					// revoke access
-					elgg_unset_plugin_user_setting("facebook_access_token", $user->getGUID(), "socialink");
-				}
-			}
-			
-			// restore hidden status
-			access_show_hidden_entities($access_status);
+			);			
 			
 			// register user's access tokens
-			$result = elgg_set_plugin_user_setting("facebook_access_token", $token, $user_guid, "socialink");
+			$result = elgg_set_plugin_user_setting("facebook_fbuid", $fbuid, $user_guid, "socialink");
 		}
 		
 		return $result;
@@ -385,13 +386,16 @@
 							
 							try {
 								if($user_guid = register_user($username, $pwd, $name, $email)){
-									// show hidden entities
+                                                                        $fbuid = socialink_facebook_get_fbuid($token);
+                                                                    
+									// show hidden entities                                                                    
 									$access = access_get_show_hidden_status();
 									access_show_hidden_entities(TRUE);
 									
 									if($user = get_user($user_guid)){
 										// register user's access tokens
 										elgg_set_plugin_user_setting('facebook_access_token', $token, $user_guid, "socialink");
+                                                                                elgg_set_plugin_user_setting('facebook_fbuid', $fbuid, $user_guid, "socialink");
 										
 										// no need for uservalidationbyemail
 										elgg_unregister_plugin_hook_handler("register", "user", "uservalidationbyemail_disable_new_user");

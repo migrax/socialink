@@ -99,13 +99,14 @@
 								$state = get_input("state", NULL);
 									
 								if($token = socialink_facebook_get_access_token($state)){
+                                                                        $fbuid = socialink_facebook_get_fbuid($token);
 									$params = array(
 										"type" => "user",
 										"limit" => 1,
 										"site_guids" => false,
 										"plugin_id" => "socialink",
 										"plugin_user_setting_name_value_pairs" =>  array(
-											"facebook_access_token" => $token
+											"facebook_fbuid" => $fbuid,
 										)
 									);
 									
