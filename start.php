@@ -40,6 +40,7 @@
 		// register event handlers
 		//register_elgg_event_handler("create", "object", "socialink_create_object_handler");
 		elgg_register_event_handler("login", "user", "socialink_login_user_handler", 450);
+                elgg_register_event_handler('logout', 'user', 'socialink_logout_user_handler');
                 
                 // Register javascript pages
                 elgg_register_simplecache_view('js/socialink/facebook');
@@ -48,7 +49,7 @@
 		// hooks
 		elgg_register_plugin_hook_handler("socialink:sync", "user", "socialink_sync_network_hook");
 		elgg_register_plugin_hook_handler("public_pages", "walled_garden", "socialink_walled_garden_hook");
-		elgg_register_plugin_hook_handler("register", "user", "socialink_register_user_hook", 450);
+		elgg_register_plugin_hook_handler("register", "user", "socialink_register_user_hook", 450);               
 		
 		// register actions
 		elgg_register_action("socialink/remove", dirname(__FILE__) . "/actions/remove.php");
@@ -73,8 +74,12 @@
 	
         function socialink_ps() {
             if (!elgg_is_logged_in()) {
-                elgg_load_js('socialink:facebook');
-                elgg_extend_view('page/elements/foot', 'socialink/facebook');
+                global $SESSION;
+                
+                if (!isset($SESSION['socialink_noseamless']) || $SESSION['socialink_noseamless'] !== true) {
+                    elgg_load_js('socialink:facebook');
+                    elgg_extend_view('page/elements/foot', 'socialink/facebook');
+                }
             }
         }
         

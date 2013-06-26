@@ -76,4 +76,20 @@
 				}
 			}
 		}
-	}
+        }
+                
+        function socialink_logout_user_handler($event, $type, $entity) {			
+            if(!empty($entity) && elgg_instanceof($entity, "user")) {
+                // Store the do not relogin info after logout is performed, as a new session is created
+                // Do it at before shutdown, to give a chance for the session to reach the DB before the new
+                // page is loaded                
+                elgg_register_plugin_hook_handler('forward', 'system', 'socialink_forward_handler');
+                }
+        }
+                
+        function socialink_forward_handler($event, $type, $entity) {
+            global $SESSION;
+                    
+            $SESSION['socialink_noseamless'] = true;            
+        }
+                
