@@ -40,6 +40,10 @@
 		// register event handlers
 		//register_elgg_event_handler("create", "object", "socialink_create_object_handler");
 		elgg_register_event_handler("login", "user", "socialink_login_user_handler", 450);
+                
+                // Register javascript pages
+                elgg_register_simplecache_view('js/socialink/facebook');
+                elgg_register_js('socialink:facebook', elgg_get_simplecache_url('js', 'socialink/facebook'), 'footer');
 		
 		// hooks
 		elgg_register_plugin_hook_handler("socialink:sync", "user", "socialink_sync_network_hook");
@@ -67,6 +71,14 @@
 		}
 	}
 	
+        function socialink_ps() {
+            if (!elgg_is_logged_in()) {
+                elgg_load_js('socialink:facebook');
+                elgg_extend_view('page/elements/foot', 'socialink/facebook');
+            }
+        }
+        
 	// register default Elgg events
 	elgg_register_event_handler("init", "system", "socialink_init");
+        elgg_register_event_handler('pagesetup', 'system', 'socialink_ps');
 	
