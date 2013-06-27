@@ -73,7 +73,7 @@
 	}
 	
         function socialink_ps() {
-            if (!elgg_is_logged_in()) {
+            if (!elgg_is_logged_in() && !elgg_in_context('socialink')) {
                 global $SESSION;
                 
                 if (!isset($SESSION['socialink_noseamless']) || $SESSION['socialink_noseamless'] !== true) {
